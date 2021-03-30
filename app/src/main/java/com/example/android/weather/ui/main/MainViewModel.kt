@@ -3,18 +3,21 @@ package com.example.android.weather.ui.main
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import java.lang.Thread.sleep
 
-class MainViewModel (private val liveDataToObserve: MutableLiveData<Any>=MutableLiveData()) :
+class MainViewModel (private val liveDataToObserve: MutableLiveData<AppState>=MutableLiveData(),
+private val repositoryImpl:Repository=RepositoryImpl()) :
     ViewModel() {
-    fun getData(): LiveData<Any> {
-        getDataFromLocalSource()
-        return liveDataToObserve
-    }
+    fun getLiveData()=liveDataToObserve
+
+    fun getWeatherFromLocalSource()=getDataFromLocalSource()
+    fun getWeatherFromRemoteSource()=getDataFromLocalSource()
 
     private fun getDataFromLocalSource(){
+        liveDataToObserve.value=AppState.Loading
         Thread{
             sleep(1000)
-            liveDataToObserve.postValue(Any())
+            liveDataToObserve.postValue(AppState.Success(repositoryImpl.getWeatherFromLocalStorage()))
         }.start()
     }
 }
